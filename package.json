@@ -1,0 +1,62 @@
+{
+  "name": "phonepresenter",
+  "productName": "PhonePresenter",
+  "version": "2.1.1",
+  "license": "GPL-3.0-only",
+  "description": "Control presentations from your smartphone.",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron .",
+    "pack": "electron-builder --dir",
+    "dist": "electron-builder"
+  },
+  "repository": "https://github.com/PhonePresenter/PhonePresenter",
+  "keywords": [
+    "Electron",
+    "PowerPoint",
+    "presentation",
+    "remote",
+    "smartphone",
+    "phone",
+    "clicker"
+  ],
+  "author": {
+    "name": "James King",
+    "email": "hello@chromaticaldesign.com",
+    "url": "https://github.com/chromatical"
+  },
+  "homepage": "https://phonepresenter.github.io",
+  "devDependencies": {
+    "electron": "^1.8.6"
+  },
+  "dependencies": {
+    "cors": "^2.8.4",
+    "express": "^4.15.5",
+    "framework7": "^1.6.5",
+    "hammerjs": "^2.0.8",
+    "http-auth": "^3.2.3",
+    "ip": "^1.1.5",
+    "jquery": "^3.2.1",
+    "menubar": "^5.2.3",
+    "moment": "^2.18.1",
+    "pkginfo": "^0.4.1"
+  },
+  "build": {
+    "appId": "com.ChromaticalDesign.PhonePresenter",
+    "linux": {
+      "category": "Office",
+      "target": [
+        "deb",
+        "appImage"
+      ],
+      "depends": [
+        "libappindicator1",
+        "xdotool",
+        "libgconf-2-4"
+      ]
+    },
+    "mac": {
+      "category": "public.app-category.productivity"
+    }
+  }
+}

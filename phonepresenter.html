@@ -1,0 +1,432 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=no, minimal-ui">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="theme-color" content="#2196f3">
+    <title>PhonePresenter</title>
+    <link rel="stylesheet" href="static/framework7/css/framework7.material.min.css">
+    <link rel="stylesheet" href="static/framework7/css/framework7.material.colors.min.css">
+    <link rel="stylesheet" href="static/font-awesome/css/font-awesome.min.css">
+    <style>
+    .center-text{
+      text-align: center;
+    }
+    .left-text{
+      text-align: left;
+    }
+    .big-action{
+      padding: 100px 0px 100px 0px !important;
+    }
+    .big-action i{
+      margin-top: -42px;
+    }
+    .hidden{
+      display: none;
+    }
+    #swipeMode{
+      margin-top: 20px;
+      background: #9e9e9e;
+      padding: 80px 0px 40px 0px;
+      color: white;
+      height: calc(50vh);
+    }
+    .swipe{
+      transform: translate3d(0, 0, 0);
+      transition: .45s;
+    }
+    #screenshot{
+      max-width: 80%;
+      margin-top: 20px;
+    }
+    #stopwatchPause{
+      width: 40px;
+      display: inline-block;
+    }
+    #stopwatch{
+      color: #2196f3;
+      margin: 0;
+      padding: 0;
+      display: inline-block;
+      vertical-align: text-bottom;
+      margin-right: 10px;
+      margin-top: 20px;
+    }
+    </style>
+  </head>
+  <body>
+    <div class="views">
+      <div class="view view-main">
+        <div class="pages navbar-fixed">
+          <div data-page="index" class="page">
+            <div class="navbar">
+              <div class="navbar-inner">
+                <div class="center">PhonePresenter</div>
+                <div class="right">
+                  <a href="#" id="menu" class="link"><i class="fa fa-bars"></i></a>
+                </div>
+              </div>
+            </div>
+            <div class="page-content center-text">
+              <div id="stopwatchWrapper" style="display:none;">
+                <h1 id="stopwatch"></h1>
+                <a id="stopwatchPause" class="button button-fill button-raised"><i class="fa fa-pause"></i></a>
+              </div>
+              <img src="" id="screenshot" style="display:none;">
+              <div class="content-block" id="buttonMode">
+                <p class="buttons-row">
+                  <a href="#" class="button button-big button-raised button-fill color-blue action big-action" id="prev"><i class="fa fa-chevron-left fa-3x"></i></a>
+                  <a href="#" class="button button-big button-raised button-fill color-blue action big-action" id="next"><i class="fa fa-chevron-right fa-3x"></i></a>
+                </p>
+                <div class="row">
+                  <div class="col-33">
+                  </div>
+                  <div class="col-33">
+                    <a href="#" class="button button-big button-raised button-fill color-blue action" id="blank"><i class="fa fa-eye-slash"></i></a>
+                  </div>
+                  <div class="col-33">
+                  </div>
+                </div>
+              </div>
+              <div id="swipeMode" class="hidden">
+                <div class="row">
+                  <div class="col-33">
+                    <i class="fa fa-chevron-right fa-3x swipe"></i>
+                    <br>
+                    Previous
+                  </div>
+                  <div class="col-33">
+                  </div>
+                  <div class="col-33">
+                    <i class="fa fa-chevron-left fa-3x swipe"></i>
+                    <br>
+                    Next
+                  </div>
+                </div>
+                <i class="fa fa-chevron-up fa-3x swipe"></i>
+                <br>
+                Blank
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="popup launcher-modal">
+      <div class="page">
+        <div class="toolbar toolbar-bottom">
+          <div class="toolbar-inner">
+            <a href="#" class="link directory-up">Up</a>
+            <a href="#" class="link close-popup">Close</a>
+          </div>
+        </div>
+        <form class="searchbar">
+          <div class="searchbar-input">
+            <input type="search" placeholder="Search">
+            <a href="#" class="searchbar-clear"></a>
+          </div>
+          <a href="#" class="searchbar-cancel">Cancel</a>
+        </form>
+        <div class="searchbar-overlay"></div>
+        <div class="page-content">
+          <div class="content-block searchbar-not-found">
+            <ul></ul>
+          </div>
+          <div class="list-block list-block-search searchbar-found">
+              <ul id="file-list">
+              </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <audio class="hidden" src="/static/sound/click.mp3"></audio>
+    <script type="text/javascript" src="static/framework7/js/framework7.min.js"></script>
+    <script type="text/javascript" src="static/jquery/jquery.min.js"></script>
+    <script type="text/javascript" src="static/hammer/hammer.min.js"></script>
+    <script type="text/javascript" src="static/moment/moment.min.js"></script>
+    <script>
+    var phonepresenter = new Framework7({material: true})
+    var $$ = Dom7
+    var connection
+    var timeout
+    var hold
+    var updateScreenshot
+    // Workaround for iOS
+    var mobileSound = false
+    var launcherEnabled = false
+
+    var search = phonepresenter.searchbar('.searchbar', {
+      searchList: '.list-block-search',
+      searchIn: '.item-title'
+    })
+
+    // Check that the server is accessible
+    setInterval(function () {
+      $.ajax(
+        {url: '/ishere',
+          type: 'HEAD',
+          timeout: 2000,
+          success: function () {
+            if (!connection) {
+              connection = true
+              phonepresenter.hidePreloader()
+            }
+          },
+          error: function () {
+            if (connection) {
+              connection = false
+              phonepresenter.showPreloader('Connection lost...')
+            }
+          }
+        })
+    }, 2000)
+
+    // Boolean for sound
+    if (localStorage.getItem('sound')) {
+      if (localStorage.getItem('sound') === 'true') {
+        var sound = true
+      } else {
+        var sound = false
+      }
+    } else {
+      var sound = true
+    }
+
+    // Load the sound file for Swipe Mode (workaround for iOS)
+    $('#swipeMode').on('touchstart mousedown', function () {
+      if (!mobileSound) {
+        $('audio').trigger('load')
+        mobileSound = true
+      }
+    })
+
+    // Perform an action (left, right, etc)
+    function action (act) {
+      $.ajax({
+        type: 'POST',
+        url: '/' + act
+      })
+      // Play the sound on action
+      if (sound) {
+        $('audio').prop('currentTime', 0)
+        $('audio').trigger('play')
+      }
+    }
+
+    $('.action').on('touchstart mousedown', function (e) {
+      e.preventDefault()
+      var act = $(this).attr('id')
+      action(act)
+      // Repeated action if the button is held down
+      timeout = setTimeout(function () {
+        hold = setInterval(function () {
+          action(act)
+        }, 300)
+      }, 1000)
+    })
+
+    // Stop the repeated action
+    $('.action').on('touchend touchleave mouseup mouseleave', function (e) {
+      e.preventDefault()
+      clearTimeout(timeout)
+      clearInterval(hold)
+    })
+
+    $$('#menu').on('click', function () {
+      var speaker
+      var swipeMode
+
+      // Changes speaker button to what is currently active
+      if (sound) {
+        speaker = '<i class="fa fa-volume-up"></i>'
+      } else {
+        speaker = '<i class="fa fa-volume-off"></i>'
+      }
+
+      // Changes swipe mode button text to what is currently visible4
+      if ($('#swipeMode').is(':visible')) {
+        swipeMode = 'Button'
+      } else {
+        swipeMode = 'Swipe'
+      }
+
+      var buttons = [
+        {
+          text: 'Start',
+          onClick: function () {
+            action('start')
+          }
+        },
+        {
+          text: 'End',
+          onClick: function () {
+            action('end')
+          }
+        },
+        {
+          text: swipeMode + ' Mode',
+          onClick: function () {
+            $('#buttonMode').toggle()
+            $('#swipeMode').toggle()
+          }
+        },
+        {
+          text: 'Sound ' + speaker,
+          onClick: function () {
+            sound = !sound
+            localStorage.setItem('sound', sound)
+          }
+        }
+      ]
+
+      if (launcherEnabled){
+        buttons.unshift({
+          text: 'Launch',
+          onClick: function () {
+            path = []
+            fileList(pathify(path))
+            phonepresenter.popup('.launcher-modal', true, true)
+          }
+        })
+      }
+
+      phonepresenter.actions(buttons)
+    })
+
+    var path = []
+
+    // Makes the path variable into a path string with slashes
+    function pathify(list){
+      var outputpath = ''
+      list.forEach(function(item){
+        outputpath = outputpath + '/' + item
+      })
+      return outputpath
+    }
+
+    function fileList(folderpath){
+      $('#file-list').empty()
+      $.getJSON({url: '/launcher/list?path='+folderpath,
+        success: function(filelist){
+          filelist.forEach(function(file){
+            if (file.type === "directory"){
+              $('#file-list').append('<li><a href="#" data-type="'+ file.type +'" data-filename="'+ file.name +'" class="item-link item-content file-link"><div class="item-media"><i class="fa fa-folder-open-o"></i></div><div class="item-inner"><div class="item-title">'+ file.name +'</div></div></a></li>')
+            }
+            else{
+              $('#file-list').append('<li><a href="#" data-type="'+ file.type +'" data-filename="'+ file.name +'" class="item-link item-content file-link"><div class="item-media"><i class="fa fa-file-o"></i></div><div class="item-inner"><div class="item-title">'+ file.name +'</div></div></a></li>')
+            }
+          })
+        }
+      })
+      $('.searchbar-input input').val('')
+    }
+
+    $(document).on('click', '.file-link', function(){
+      path.push($(this).attr('data-filename'))
+      fileList(pathify(path))
+      if ($(this).attr('data-type') === 'file'){
+        phonepresenter.closeModal('.launcher-modal', true)
+      }
+    })
+
+    $('.directory-up').on('click', function(){
+      path.pop()
+      fileList(pathify(path))
+    })
+
+    // Sets hammerjs swiper settings
+    var swipe = new Hammer($('#swipeMode')[0])
+
+    swipe.get('swipe').set({ direction: Hammer.DIRECTION_ALL })
+
+    swipe.on('swipeleft', function () {
+      $('.swipe.fa-chevron-left').css('transform', 'translate3d(-50px, 0, 0)')
+      setTimeout(function () {
+        $('.swipe.fa-chevron-left').css('transform', 'translate3d(0, 0, 0)')
+      }, 550)
+      action('next')
+    })
+
+    swipe.on('swiperight', function () {
+      $('.swipe.fa-chevron-right').css('transform', 'translate3d(50px, 0, 0)')
+      setTimeout(function () {
+        $('.swipe.fa-chevron-right').css('transform', 'translate3d(0, 0, 0)')
+      }, 550)
+      action('prev')
+    })
+
+    swipe.on('swipedown swipeup', function () {
+      $('.swipe.fa-chevron-up').css('transform', 'translate3d(0, -50px, 0)')
+      setTimeout(function () {
+        $('.swipe.fa-chevron-up').css('transform', 'translate3d(0, 0, 0)')
+      }, 550)
+      action('blank')
+    })
+
+    function loadConfig(){
+      $.getJSON({url: '/config',
+        success: function(config){
+          if (config.screenview === true){
+            $('#screenshot').show()
+            var screenshotLoaded = true
+            setInterval(function(){
+              if (screenshotLoaded){
+                screenshotLoaded = false
+                $.ajax({
+                  url: '/screenshot',
+                  timeout: 10000,
+                  success: function(result){
+                    $('#screenshot').attr('src', 'data:image/png;base64,' + result);
+                    screenshotLoaded = true
+                  },
+                  error: function(){
+                    screenshotLoaded = true
+                  }
+                })
+              }
+            }, Number(config.refresh)*1000)
+          }
+          if (config.stopwatch === true){
+            $('#stopwatchWrapper').show()
+            var stopwatchStart = Math.floor(Date.now() / 1000)
+            var stopwatchElapsedTime = 0
+            var stopwatch = false
+
+            function startStopWatch(){
+              stopwatchStart = Math.floor(Date.now() / 1000)
+              stopwatch = setInterval(function(){
+                $('#stopwatch').text(moment().startOf('day').seconds(Math.floor(Date.now() / 1000) - stopwatchStart + stopwatchElapsedTime).format('H:mm:ss'))
+              },1000)
+              $('#stopwatchPause').html('<i class="fa fa-pause"></i>')
+            }
+
+            $('#stopwatchPause').on('click', function(){
+              if (stopwatch){
+                stopwatchElapsedTime = Math.floor(Date.now() / 1000) - stopwatchStart + stopwatchElapsedTime
+                clearInterval(stopwatch)
+                stopwatch = false
+                $('#stopwatchPause').html('<i class="fa fa-play"></i>')
+              }
+              else{
+                startStopWatch()
+              }
+            })
+
+            startStopWatch()
+          }
+          if (config.launcher){
+            launcherEnabled = true
+          }
+        },
+        error: function(){
+          loadConfig()
+        }
+      })
+    }
+
+    loadConfig()
+    </script>
+  </body>
+</html>

@@ -1,0 +1,555 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <!-- Required meta tags-->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=no, minimal-ui">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <!-- Color theme for statusbar -->
+    <meta name="theme-color" content="#2196f3">
+    <!-- Your app title -->
+    <title>PhonePresenter</title>
+    <!-- Path to Framework7 Library CSS, Material Theme -->
+    <link rel="stylesheet" href="node_modules/framework7/dist/css/framework7.material.min.css">
+    <!-- Path to Framework7 color related styles, Material Theme -->
+    <link rel="stylesheet" href="node_modules/framework7/dist/css/framework7.material.colors.min.css">
+    <link rel="stylesheet" href="resources/font-awesome/css/font-awesome.min.css">
+    <style>
+    body{
+      -webkit-user-select: none;
+      cursor: default;
+    }
+    .popup .page-content{
+      padding: 0 !important;
+      height: calc(100% - 152px);
+      top: 104px;
+    }
+    .hidden-field, .hidden{
+      display: none;
+    }
+    .swiper-container {
+      height: 100%;
+    }
+    .center-text{
+      text-align: center;
+    }
+    .left-text{
+      text-align: left;
+    }
+    .item-input.item-input-field.invalid::after{
+      background: #f44336 !important;
+    }
+    ::-webkit-scrollbar{
+      width: 5px;
+    }
+    ::-webkit-scrollbar-track{
+      margin-top: 2px;
+      margin-bottom: 2px;
+      opacity: 0;
+    }
+    ::-webkit-scrollbar-thumb{
+      border-radius: 5px;
+      background: #BDBDBD;
+    }
+    .tabbar a.tab-link{
+      font-size: 12px;
+    }
+    </style>
+    <script type="text/javascript">
+    var $ = global.jQuery = require('jquery')
+    </script>
+  </head>
+  <body>
+    <!-- Views -->
+    <div class="views">
+      <!-- Your main view, should have "view-main" class -->
+      <div class="view view-main">
+        <!-- Pages container, because we use fixed navbar and toolbar, it has additional appropriate classes-->
+        <div class="pages navbar-fixed">
+          <!-- Page, "data-page" contains page name -->
+          <div data-page="index" class="page">
+
+            <!-- Top Navbar. In Material theme it should be inside of the page-->
+            <div class="navbar">
+              <div class="navbar-inner">
+                <div class="center">PhonePresenter</div>
+                <div class="right">
+                  <a href="#" data-popover=".popover-links" class="open-popover link"><i class="fa fa-bars" aria-hidden="true"></i></a>
+                </div>
+              </div>
+            </div>
+
+            <!-- Scrollable page content -->
+            <div class="page-content">
+              <div class="content-block errorpage hidden center-text">
+                <i class="fa fa-exclamation-triangle fa-3x" aria-hidden="true"></i>
+                <h2>Server Error</h2>
+                <p>The PhonePresenter server failed to start.  Check socket and port settings.</p>
+                <a href="#" data-popup="#settings" class="open-popup button button-big button-fill button-raised color-blue">Settings</a>
+                <p><a href="#" onclick="$('#error-text').parent().slideToggle()">Error Details</a></p>
+                <p class="hidden"><small id="error-text"></small></p>
+              </div>
+              <!-- Slider container -->
+              <div class="swiper-container swiper-no-swiping">
+                  <!-- Slides wrapper -->
+                  <div class="swiper-wrapper">
+                      <!-- Slides -->
+                      <div class="swiper-slide center-text">
+                        <div class="content-block">
+                          <h2>Pairing Wizard</h2>
+                          <p>This wizard will help you connect a device to PhonePresenter.</p>
+                          <div class="list-block inset left-text">
+                            <ul>
+                              <li>
+                                <div class="item-content">
+                                  <div class="item-inner">
+                                    <div class="item-title label">Network Interface</div>
+                                    <div class="item-input" id="interfaces">
+                                      <select>
+                                      </select>
+                                    </div>
+                                  </div>
+                                </div>
+                              </li>
+                            </ul>
+                          </div>
+                          <a href="#" class="button button-big button-fill button-raised color-blue" onclick="swiper.slideTo(1)">Pair Device</a>
+                        </div>
+                      </div>
+                      <div class="swiper-slide center-text">
+                        <div class="content-block">
+                          <h2>Connect to Network</h2>
+                          <p>Connect your device to the same network as this computer.</p>
+                          <a href="#" class="button button-big button-fill button-raised color-blue" onclick="swiper.slideNext()">Continue</a>
+                        </div>
+                      </div>
+                      <div class="swiper-slide center-text">
+                        <div class="content-block">
+                          <h2>Pair Device</h2>
+                          <div id="with-internet">
+                            <p>On your device, open the web browser and navigate to <b class="color-blue">phonepresenter.github.io/pair</b>.  Enter the following numbers and tap Connect.</p>
+                            <h2><span id="ip1"></span>-<span id="ip2"></span>-<span id="ip3"></span>-<span id="ip4"></span>-<span id="ip5"></span></h2>
+                            <span class="preloader"></span>
+                            <br>
+                            <br>
+                            <br>
+                            <small><a href="#" onclick="$('#with-internet').fadeOut(function(){$('#without-internet').fadeIn()})">Don't have internet?</a></small>
+                          </div>
+                          <div id="without-internet" class="hidden">
+                            <p>On your device, open the web browser and enter the following into the address bar.</p>
+                            <h2><span id="ip"></span></h2>
+                            <a href="#" class="button button-big button-fill button-raised color-blue" onclick="swiper.slideNext()">Continue</a>
+                        </div>
+                      </div>
+                    </div>
+                      <div class="swiper-slide center-text">
+                        <div class="content-block">
+                          <h2>Start Presentation</h2>
+                          <p>Start your presentation.  The presentation window must be the top and active window for PhonePresenter to work properly.</p>
+                          <a href="#" class="button button-big button-fill button-raised color-blue" onclick="$('#with-internet').show();$('#without-internet').hide();swiper.slideTo(0, 0);ipcRenderer.send('hide-window', '')">Finish</a>
+                        </div>
+                      </div>
+                  </div>
+                  <!-- Pagination, if required -->
+                  <div class="swiper-pagination"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="popover popover-links">
+      <div class="popover-angle"></div>
+      <div class="popover-inner">
+        <div class="list-block">
+          <ul>
+            <li><a href="#" data-popup="#settings" class="open-popup close-popover list-button item-link">Settings</a></li>
+            <li><a href="#" class="list-button item-link" onclick="showCustomModal('credits')">Credits</a></li>
+            <!--<li><a href="#" class="list-button item-link" onclick="showCustomModal('share')">Share</a></li>-->
+          </ul>
+        </div>
+      </div>
+    </div>
+
+
+    <!-- About Popup -->
+    <div class="popup" id="settings">
+      <div class="views">
+        <div class="view view-main">
+          <div class="pages">
+            <!-- Now we need additional "navbar-fixed" and "toolbar-fixed" classes on Page -->
+            <div data-page="index" class="page navbar-fixed toolbar-fixed">
+
+              <!-- Top Navbar-->
+              <div class="navbar">
+                <div class="navbar-inner">
+                  <div class="center">PhonePresenter Settings</div>
+                </div>
+              </div>
+
+              <!-- /End of Top Navbar-->
+              <div class="toolbar tabbar">
+                <div class="toolbar-inner">
+                    <a href="#tab1" class="tab-link active">General</a>
+                    <a href="#tab2" class="tab-link">Screen View</a>
+                    <a href="#tab3" class="tab-link">Stopwatch</a>
+                    <a href="#tab4" class="tab-link">Launcher</a>
+                </div>
+              </div>
+              <div class="page-content">
+                <form id="settingsForm">
+                <div class="tabs">
+                  <!-- Tab 1, active by default -->
+                  <div id="tab1" class="tab active">
+                    <div class="content-block">
+                      <div class="content-block-title">Authentication</div>
+                      <div class="list-block inset">
+                        <ul>
+                          <li>
+                            <div class="item-content">
+                              <div class="item-inner">
+                                <div class="item-title label">Enable Authentication</div>
+                                <div class="item-input">
+                                  <label class="label-switch">
+                                    <input type="checkbox" id="authentication" name="authentication" onchange="toggleField('.auth-field')">
+                                    <div class="checkbox"></div>
+                                  </label>
+                                </div>
+                              </div>
+                            </div>
+                          </li>
+                          <!-- Text inputs -->
+                          <li class="hidden-field auth-field">
+                            <div class="item-content">
+                              <div class="item-media"><i class="fa fa-user" aria-hidden="true"></i></div>
+                              <div class="item-inner">
+                                <div class="item-title label">Username</div>
+                                <div class="item-input">
+                                  <input type="text" id="username" name="username">
+                                </div>
+                              </div>
+                            </div>
+                          </li>
+                          <li class="hidden-field auth-field">
+                            <div class="item-content">
+                              <div class="item-media"><i class="fa fa-key" aria-hidden="true"></i></div>
+                              <div class="item-inner">
+                                <div class="item-title label">Password</div>
+                                <div class="item-input">
+                                  <input type="password" id="password" name="password">
+                                </div>
+                              </div>
+                            </div>
+                          </li>
+                        </ul>
+                      </div>
+                    </div>
+                    <div class="content-block">
+                      <div class="content-block-title">Socket</div>
+                      <div class="list-block inset">
+                        <ul>
+                          <li>
+                            <div class="item-content">
+                              <div class="item-inner">
+                                <div class="item-title label">Custom Socket</div>
+                                <div class="item-input">
+                                  <label class="label-switch">
+                                    <input type="checkbox" id="customsocket" name="customsocket" onchange="toggleField('.socket-field')">
+                                    <div class="checkbox"></div>
+                                  </label>
+                                </div>
+                              </div>
+                            </div>
+                          </li>
+                          <!-- Text inputs -->
+                          <li class="hidden-field socket-field">
+                            <div class="item-content">
+                              <div class="item-media"><i class="fa fa-link" aria-hidden="true"></i></div>
+                              <div class="item-inner">
+                                <div class="item-title label">Socket</div>
+                                <div class="item-input">
+                                  <input type="text" id="socket" name="socket">
+                                </div>
+                              </div>
+                            </div>
+                          </li>
+                        </ul>
+                      </div>
+                    </div>
+                    <div class="content-block">
+                      <div class="content-block-title">Port</div>
+                      <div class="list-block inset">
+                        <ul>
+                          <li>
+                            <div class="item-content">
+                              <div class="item-inner">
+                                <div class="item-title label">Custom Port</div>
+                                <div class="item-input">
+                                  <label class="label-switch">
+                                    <input type="checkbox" id="customport" name="customport" onchange="toggleField('.port-field')">
+                                    <div class="checkbox"></div>
+                                  </label>
+                                </div>
+                              </div>
+                            </div>
+                          </li>
+                          <!-- Text inputs -->
+                          <li class="hidden-field port-field">
+                            <div class="item-content">
+                              <div class="item-media"><i class="fa fa-plug" aria-hidden="true"></i></div>
+                              <div class="item-inner">
+                                <div class="item-title label">Port</div>
+                                <div class="item-input">
+                                  <input type="number" min="1" value="1028" max="65535" id="port" name="port">
+                                </div>
+                              </div>
+                            </div>
+                          </li>
+                        </ul>
+                      </div>
+                    </div>
+                    <div class="content-block">
+                      <div class="content-block-title">Updates</div>
+                      <div class="list-block inset">
+                        <ul>
+                          <li>
+                            <div class="item-content">
+                              <div class="item-inner">
+                                <div class="item-title label">Automatically Check for Updates</div>
+                                <div class="item-input">
+                                  <label class="label-switch">
+                                    <input type="checkbox" id="updates" name="updates">
+                                    <div class="checkbox"></div>
+                                  </label>
+                                </div>
+                              </div>
+                            </div>
+                          </li>
+                          <!--<li class="hidden">
+                            <div class="item-content">
+                              <div class="item-inner">
+                                <div class="item-title label">Shared PhonePresenter</div>
+                                <div class="item-input">
+                                  <label class="label-switch">
+                                    <input type="checkbox" id="shared" name="shared">
+                                    <div class="checkbox"></div>
+                                  </label>
+                                </div>
+                              </div>
+                            </div>
+                          </li>-->
+                        </ul>
+                      </div>
+                  </div>
+                  </div>
+                  <!-- Tab 2 -->
+                  <div id="tab2" class="tab">
+                    <div class="content-block">
+                      <div class="content-block-title">Screen View</div>
+                      <div class="list-block inset">
+                        <ul>
+                          <li>
+                            <div class="item-content">
+                              <div class="item-inner">
+                                <div class="item-title label">Enable Screen View</div>
+                                <div class="item-input">
+                                  <label class="label-switch">
+                                    <input type="checkbox" id="screenview" name="screenview" onchange="toggleField('.screenview-field')">
+                                    <div class="checkbox"></div>
+                                  </label>
+                                </div>
+                              </div>
+                            </div>
+                          </li>
+                          <li class="hidden-field screenview-field">
+                            <div class="item-content">
+                              <div class="item-media"><i class="fa fa-refresh" aria-hidden="true"></i></div>
+                              <div class="item-inner">
+                                <div class="item-title label">Refresh Rate (seconds)</div>
+                                <div class="item-input">
+                                  <input type="number" min="0.1" value="0.1" step="0.1" id="refresh" name="refresh">
+                                </div>
+                              </div>
+                            </div>
+                          </li>
+                          <li class="hidden-field screenview-field">
+                            <div class="item-content">
+                              <div class="item-media"><i class="fa fa-signal" aria-hidden="true"></i></div>
+                              <div class="item-inner">
+                                <div class="item-title label">Quality</div>
+                                <div class="item-input">
+                                  <div class="range-slider">
+                                    <input type="range" min="10" max="100" step="10" value="80" id="quality" name="quality">
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+                          </li>
+                        </ul>
+                      </div>
+                  </div>
+                </div>
+                  <!-- Tab 3 -->
+                  <div id="tab3" class="tab">
+                    <div class="content-block">
+                      <div class="content-block-title">Stopwatch</div>
+                      <div class="list-block inset">
+                        <ul>
+                          <li>
+                            <div class="item-content">
+                              <div class="item-inner">
+                                <div class="item-title label">Enable Stopwatch</div>
+                                <div class="item-input">
+                                  <label class="label-switch">
+                                    <input type="checkbox" id="stopwatch" name="stopwatch">
+                                    <div class="checkbox"></div>
+                                  </label>
+                                </div>
+                              </div>
+                            </div>
+                          </li>
+                        </ul>
+                      </div>
+                    </div>
+                  </div>
+                  <div id="tab4" class="tab">
+                    <div class="content-block">
+                      <div class="content-block-title">Launcher</div>
+                      <div class="list-block inset">
+                        <ul>
+                          <li>
+                            <div class="item-content">
+                              <div class="item-inner">
+                                <div class="item-title label">Enable Launcher</div>
+                                <div class="item-input">
+                                  <label class="label-switch">
+                                    <input type="checkbox" id="launcher" name="launcher" onclick="toggleField('.launcher-field')">
+                                    <div class="checkbox"></div>
+                                  </label>
+                                </div>
+                              </div>
+                            </div>
+                          </li>
+                          <li class="hidden-field launcher-field">
+                            <div class="item-content">
+                              <div class="item-media"><i class="fa fa-folder" aria-hidden="true"></i></div>
+                              <div class="item-inner">
+                                <div class="item-title label">Presentation Folder</div>
+                                <div class="item-input">
+                                  <input type="text" id="launcher-folder" name="launcher-folder" readonly="true">
+                                </div>
+                              </div>
+                            </div>
+                            <a href="#" id="folderBrowser" class="button button-fill button-raised">Browse</a>
+                          </li>
+                          <br><br>
+                          <li class="hidden-field launcher-field">
+                            <div class="item-content">
+                              <div class="item-media"><i class="fa fa-file-o" aria-hidden="true"></i></div>
+                              <div class="item-inner">
+                                <div class="item-title label">Accepted File Extensions</div>
+                                <div class="item-input">
+                                  <input type="text" id="launcher-extensions" name="launcher-extensions">
+                                </div>
+                                <div class="item-title label">e.g ".pps .ppsx .odp"</div>
+                              </div>
+                            </div>
+                          </li>
+                        </ul>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </form>
+
+            </div>
+            <div class="toolbar toolbar-bottom">
+                <div class="toolbar-inner">
+                    <a href="#" class="close-popup link" onclick="loadSettings()"><i class="fa fa-close" aria-hidden="true"></i> Cancel</a>
+                    <a href="#" class="link" onclick="saveSettings(true)"><i class="fa fa-check" aria-hidden="true"></i> Save</a>
+                </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+    <!-- Path to Framework7 Library JS-->
+    <script type="text/javascript" src="node_modules/framework7/dist/js/framework7.min.js"></script>
+    <script type="text/javascript">
+    const execFile = require('child_process').execFile
+    const {app} = require('electron').remote
+    const {ipcRenderer} = require('electron')
+    const {shell} = require('electron')
+    const {dialog} = require('electron').remote
+    var version = require('./package.json').version
+    var electron = require('electron')
+    var express = require('express')
+    var path = require('path')
+    var auth = require('http-auth')
+    var utils = require('./node_modules/http-auth/src/auth/utils.js')
+    var server = express()
+    var cors = require('cors')
+    var PhonePresenterInterface
+    var fs = require('fs')
+    var os = require('os')
+    var ip = require('ip')
+    var desktopCapturer = electron.desktopCapturer
+    var electronScreen = electron.screen
+
+    function screenSize () {
+      var size = electronScreen.getPrimaryDisplay().workAreaSize
+      var maxDimension = Math.max(size.width, size.height)
+      return {
+        width: maxDimension * window.devicePixelRatio,
+        height: maxDimension * window.devicePixelRatio
+      }
+    }
+
+    // Load PhonePresenter HTML file
+    fs.readFile(__dirname + '/phonepresenter.html', function (err, data) {
+      PhonePresenterInterface = data.toString()
+    })
+    </script>
+    <script type="text/javascript" src="server.js"></script>
+    <script type="text/javascript" src="settings.js"></script>
+    <script type="text/javascript" src="interface.js"></script>
+    <script type="text/javascript" src="update.js"></script>
+    <script type="text/javascript" src="init.js"></script>
+    <script type="text/javascript">
+
+    var phonepresenter = new Framework7({material: true})
+    var $$ = Dom7
+    var swiper = new Swiper('.swiper-container', {
+      pagination: '.swiper-pagination',
+      noSwiping: true
+    })
+
+    // Prevent drag and drop
+    $(document).on('dragstart dragover drop', function (e) {
+      e.preventDefault()
+    })
+    $('#folderBrowser').on('click',function(){
+      try{
+        var folder = dialog.showOpenDialog({properties: ['openDirectory']})[0]
+      }
+      catch (e){
+        ipcRenderer.send('show-window', '')
+      }
+      if (folder) {
+        $('#launcher-folder').val(folder)
+        ipcRenderer.send('show-window', '')
+      }
+    })
+
+    // Start everything
+    init()
+
+    // Show the main window
+    ipcRenderer.send('show-window', '')
+    </script>
+
+  </body>
+</html>
