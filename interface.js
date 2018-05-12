@@ -52,7 +52,7 @@ function showCustomModal (modal) {
   if (modal === 'credits') {
     phonepresenter.modal({
       title: 'PhonePresenter Credits',
-      text: 'PhonePresenter Pro '+version+'<br>&copy; 2018 James King.<br><a href="#" onclick="shell.openExternal(\'https://phonepresenter.github.io\')">phonepresenter.github.io</a><br><br><a href="#" onclick="shell.openExternal(\'https://github.com/PhonePresenter/PhonePresenter/blob/master/LICENSE\')">License Information</a>',
+      text: 'PhonePresenter '+version+'<br>&copy; 2018 James King.<br><a href="#" onclick="shell.openExternal(\'https://phonepresenter.github.io\')">phonepresenter.github.io</a><br><br><a href="#" onclick="shell.openExternal(\'https://github.com/PhonePresenter/PhonePresenter/blob/master/LICENSE\')">License Information</a>',
       buttons: [{
         text: 'Close'
       }]
