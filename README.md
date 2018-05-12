@@ -16,6 +16,7 @@ npm start
 ```
 
 ### Create Installer
+Requires that [electron-builder](https://github.com/electron-userland/electron-builder) be installed.
 ```
 npm run dist
 ```
