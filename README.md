@@ -6,6 +6,7 @@ Control presentations from your smartphone
 ### Clone and Install Dependencies
 ```
 git clone https://github.com/PhonePresenter/PhonePresenter.git
+cd PhonePresenter
 npm install
 ```
 
