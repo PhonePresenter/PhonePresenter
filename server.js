@@ -1,71 +1,26 @@
 // Perform action
 function action (act) {
   var platform = os.platform()
-  if (platform === 'win32') {
-    switch (act) {
-      case 'NEXT':
-        execFile(__dirname + '\\keysender.exe', ['next'], function () {})
-        break
-      case 'PREV':
-        execFile(__dirname + '\\keysender.exe', ['prev'], function () {})
-        break
-      case 'BLANK':
-        execFile(__dirname + '\\keysender.exe', ['blank'], function () {})
-        break
-      case 'START':
-        execFile(__dirname + '\\keysender.exe', ['start'], function () {})
-        break
-      case 'END':
-        execFile(__dirname + '\\keysender.exe', ['end'], function () {})
-        break
-      default:
-        execFile(__dirname + '\\keysender.exe', ['next'], function () {})
-        break
-    }
-  }
-  if (platform === 'darwin') {
-    switch (act) {
-      case 'NEXT':
-        execFile('osascript', ['-e', 'tell application "System Events" to key code 124'], function () {})
-        break
-      case 'PREV':
-        execFile('osascript', ['-e', 'tell application "System Events" to key code 123'], function () {})
-        break
-      case 'BLANK':
-        execFile('osascript', ['-e', 'tell application "System Events" to keystroke "b"'], function () {})
-        break
-      case 'START':
-        execFile('osascript', ['-e', 'tell application "System Events" to keystroke "p" using {option down, command down}'], function () {})
-        break
-      case 'END':
-        execFile('osascript', ['-e', 'tell application "System Events" to key code 53'], function () {})
-        break
-      default:
-        execFile('osascript', ['-e', 'tell application "System Events" to key code 124'], function () {})
-        break
-    }
-  }
-  if (platform === 'linux') {
-    switch (act) {
-      case 'NEXT':
-        execFile('xdotool', ['key', 'Right'], function () {})
-        break
-      case 'PREV':
-        execFile('xdotool', ['key', 'Left'], function () {})
-        break
-      case 'BLANK':
-        execFile('xdotool', ['key', 'b'], function () {})
-        break
-      case 'START':
-        execFile('xdotool', ['key', 'F5'], function () {})
-        break
-      case 'END':
-        execFile('xdotool', ['key', 'Escape'], function () {})
-        break
-      default:
-        execFile('xdotool', ['key', 'Right'], function () {})
-        break
-    }
+  switch (act) {
+    case 'NEXT':
+      keyboard.keyTap('right')
+      break
+    case 'PREV':
+      keyboard.keyTap('left')
+      break
+    case 'BLANK':
+      keyboard.keyTap('b')
+      break
+    case 'START':
+      if (platform === 'darwin'){
+        keyboard.keyTap('p', ['command', 'control'])
+      } else {
+        keyboard.keyTap('f5')
+      }
+      break
+    case 'END':
+      keyboard.keyTap('escape')
+      break
   }
 }
 
