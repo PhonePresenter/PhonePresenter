@@ -3,3 +3,9 @@ node_js: lts/*
 before_script:
   - npm install -g electron-builder
 script: npm run dist
+
+cache:
+  directories:
+  - node_modules
+  - $HOME/.cache/electron
+  - $HOME/.cache/electron-builder
