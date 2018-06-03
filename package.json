@@ -39,7 +39,8 @@
     "jquery": "^3.2.1",
     "menubar": "^5.2.3",
     "moment": "^2.18.1",
-    "pkginfo": "^0.4.1"
+    "pkginfo": "^0.4.1",
+    "robotjs": "^0.5.1"
   },
   "build": {
     "appId": "com.ChromaticalDesign.PhonePresenter",
