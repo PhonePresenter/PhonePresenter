@@ -13,7 +13,7 @@ function action (act) {
       break
     case 'START':
       if (platform === 'darwin'){
-        keyboard.keyTap('p', ['command', 'control'])
+        keyboard.keyTap('p', ['command', 'alt'])
       } else {
         keyboard.keyTap('f5')
       }
